@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 using Pollsar.Web.Data;
-using Pollsar.Web.Server.Models;
 
 namespace Name
 {
