@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore.ValueGeneration;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Diagnostics.CodeAnalysis;
 using System;
-using System.Security.Cryptography.X509Certificates;
 using Bogus;
 using System.Linq;
 
@@ -18,6 +17,11 @@ namespace Pollsar.Web.Data
         {
 
         }
+
+        public virtual DbSet<Poll> Polls { get; set; }
+        public virtual DbSet<Tag> Tags { get; set; }
+        public virtual DbSet<Category> Categories { get; set; }
+
 
         protected override void OnModelCreating (ModelBuilder builder)
         {
@@ -239,7 +243,8 @@ namespace Pollsar.Web.Data
             #endregion
 
             #region StaticResource
-            builder.Entity<StaticResource>(b => {
+            builder.Entity<StaticResource>(b =>
+            {
                 b.HasKey(s => s.Id);
                 b.ToTable("static_resources");
 
@@ -256,14 +261,14 @@ namespace Pollsar.Web.Data
             #endregion
 
 
-            GenerateSeedData(builder);
+            //GenerateSeedData(builder);
         }
 
         private void GenerateSeedData (ModelBuilder builder)
         {
-            var adminId = 1L;
-            var adminRoleId = 1L;
-            var userRoleId = 2L;
+            const long adminId = 1L;
+            const long adminRoleId = 1L;
+            const long userRoleId = 2L;
 
             var admin = new User
             {
@@ -307,14 +312,18 @@ namespace Pollsar.Web.Data
             var random = new Random();
             var fakeUsers = usersFaker.Generate(300);
 
+            i = 0L;
             var pollsFaker = new Faker<Poll>()
+                .RuleFor(u => u.Id, f => ++i)
                 .RuleFor(u => u.Title, f => f.Random.Words(30))
                 .RuleFor(p => p.CreatorId, f => f.PickRandom(fakeUsers.Select(u => u.Id)))
                 .RuleFor(p => p.Description, f => f.Lorem.Lines(5));
 
+            i = 1L;
             void staticImagesFakerGenerator (Poll poll)
             {
                 var imagesFaker = new Faker<StaticResource>()
+                    .RuleFor(s => s.Id, f => i++)
                 .RuleFor(s => s.RefererId, f => poll.Id)
                 .RuleFor(s => s.Url, f => f.Image.PicsumUrl());
 
@@ -323,7 +332,7 @@ namespace Pollsar.Web.Data
 
             builder.Entity<User>().HasData(fakeUsers);
             var fakePolls = pollsFaker.Generate(1000);
-            
+
             fakePolls.ForEach(staticImagesFakerGenerator);
 
             builder.Entity<Poll>().HasData(fakePolls);
