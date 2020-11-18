@@ -261,7 +261,7 @@ namespace Pollsar.Web.Data
             #endregion
 
 
-            //GenerateSeedData(builder);
+            GenerateSeedData(builder);
         }
 
         private void GenerateSeedData (ModelBuilder builder)
@@ -310,7 +310,7 @@ namespace Pollsar.Web.Data
                 .RuleFor(u => u.SecurityStamp, f => f.Random.Uuid().ToString())
                 .RuleFor(u => u.PasswordHash, (f, u) => passwordHasher.HashPassword(u, f.Internet.Password()));
             var random = new Random();
-            var fakeUsers = usersFaker.Generate(300);
+            var fakeUsers = usersFaker.Generate(30);
 
             i = 0L;
             var pollsFaker = new Faker<Poll>()
@@ -330,12 +330,34 @@ namespace Pollsar.Web.Data
                 builder.Entity<StaticResource>().HasData(imagesFaker.Generate(random.Next(1, 6)));
             }
 
-            builder.Entity<User>().HasData(fakeUsers);
-            var fakePolls = pollsFaker.Generate(1000);
+            i = 1L;
 
-            fakePolls.ForEach(staticImagesFakerGenerator);
+            var tagsFaker = new Faker<Tag>()
+                    .RuleFor(s => s.Id, f => ++i)
+                    .RuleFor(t => t.TagName, f => f.Random.Word());
+
+            var fakeTags = tagsFaker.Generate(70);
+            builder.Entity<Tag>().HasData(fakeTags);
+
+            i = 1L;
+            void tagsFakerGenerator(Poll poll)
+            {
+                var faker = new Faker<PollTag>()
+                    .RuleFor(p => p.Id, f => ++i)
+                    .RuleFor(p => p.PollId, poll.Id)
+                    .RuleFor(p => p.TagId, f => f.PickRandom(fakeTags.Select(t => t.Id)));
+
+                builder.Entity<PollTag>().HasData(faker.Generate(new Random().Next(1, 50)));
+            }
+
+            builder.Entity<User>().HasData(fakeUsers);
+            var fakePolls = pollsFaker.Generate(300);
 
             builder.Entity<Poll>().HasData(fakePolls);
+
+            fakePolls.ForEach(staticImagesFakerGenerator);
+            fakePolls.ForEach(tagsFakerGenerator);
+
             builder.Entity<IdentityUserRole<long>>().HasData(fakeUsers.Select(u => u.Id).Select(id => new IdentityUserRole<long>() { RoleId = userRoleId, UserId = id }));
         }
     }

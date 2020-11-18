@@ -5,7 +5,7 @@ namespace Pollsar.Shared.Models
 {
     public class PollChoiceViewModel : BaseViewModel
     {
-        private readonly ObservableCollection<long> votes;
+        private ObservableCollection<long> votes;
         private long id;
         private string name;
         private long? pollId;
@@ -13,8 +13,6 @@ namespace Pollsar.Shared.Models
 
         public PollChoiceViewModel ()
         {
-            votes = new ObservableCollection<long>();
-            votes.CollectionChanged += Votes_CollectionChanged;
         }
 
         private void Votes_CollectionChanged (object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -52,7 +50,13 @@ namespace Pollsar.Shared.Models
                 OnPropertyChanged();
             }
         }
-        public virtual ObservableCollection<long> Votes => votes;
+        public virtual ObservableCollection<long> Votes { get => votes;
+        set
+            {
+                votes = value;
+                votes.CollectionChanged += Votes_CollectionChanged;
+            }
+        }
         public DateTime? LastUpdated
         {
             get => lastUpdated; set

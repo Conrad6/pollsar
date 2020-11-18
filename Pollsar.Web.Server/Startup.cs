@@ -13,6 +13,7 @@ using Pollsar.Web.Server.Models;
 
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using AutoMapper;
 
 namespace Pollsar.Web.Server
 {
@@ -56,6 +57,8 @@ namespace Pollsar.Web.Server
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
                 });
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme);
+            var autoMapperConfig = new MapperConfiguration(conf => conf.AddProfile<AutoMapperProfile>());
+            services.AddSingleton(autoMapperConfig.CreateMapper());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

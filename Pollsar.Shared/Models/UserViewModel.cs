@@ -54,9 +54,17 @@ namespace Pollsar.Shared.Models
                 OnPropertyChanged();
             }
         }
-        private readonly ObservableCollection<PollViewModel> pollsCreated;
+        private ObservableCollection<PollViewModel> pollsCreated;
 
-        public ObservableCollection<PollViewModel> PollsCreated => pollsCreated;
+        public ObservableCollection<PollViewModel> PollsCreated
+        {
+            get => PollsCreated;
+            set
+            {
+                pollsCreated = value;
+                pollsCreated.CollectionChanged += PollsCreated_CollectionChanged;
+            }
+        }
 
         public UserViewModel ()
         {

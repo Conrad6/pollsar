@@ -2,9 +2,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using AutoMapper;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+using Pollsar.Shared.Models;
 using Pollsar.Web.Data;
 
 namespace Name
@@ -15,10 +18,12 @@ namespace Name
     {
         private const string pageLinkFormat = "{0}://{1}/api/v1/polls?page={2}&size={3}";
         private readonly PollsarContext _pollsarContext;
+        private readonly IMapper _mapper;
 
-        public PollsController (PollsarContext pollsarContext)
+        public PollsController (PollsarContext pollsarContext, IMapper mapper)
         {
             _pollsarContext = pollsarContext;
+            _mapper = mapper;
         }
 
         [HttpPost]
@@ -69,7 +74,7 @@ namespace Name
             pageLinkBuilder.AppendFormat(pageLinkFormat, Request.Scheme, Request.Host, totalPages - 1, size);
             lastPage = pageLinkBuilder.ToString();
 
-            return Json(new { page, size, totalCount, totalPages, nextPage, previousPage, polls });
+            return Json(new { page, size, totalCount, totalPages, nextPage, previousPage, lastPage, polls = polls.Select(p => _mapper.Map<PollViewModel>(p)) });
         }
     }
 }

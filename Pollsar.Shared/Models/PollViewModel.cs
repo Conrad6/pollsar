@@ -12,22 +12,14 @@ namespace Pollsar.Shared.Models
         private long? creatorId;
         private DateTime? dateCreated;
         private DateTime? lastUpdate;
-        private readonly ObservableCollection<PollChoiceViewModel> choices;
-        private readonly ObservableCollection<string> tags;
-        private readonly ObservableCollection<string> categories;
-        private readonly ObservableCollection<string> images;
+        private ObservableCollection<PollChoiceViewModel> choices;
+        private ObservableCollection<string> tags;
+        private ObservableCollection<string> categories;
+        private ObservableCollection<string> images;
 
         public PollViewModel ()
         {
-            choices = new ObservableCollection<PollChoiceViewModel>();
-            tags = new ObservableCollection<string>();
-            categories = new ObservableCollection<string>();
-            images = new ObservableCollection<string>();
 
-            choices.CollectionChanged += General_CollectionChanged;
-            tags.CollectionChanged += General_CollectionChanged;
-            categories.CollectionChanged += General_CollectionChanged;
-            images.CollectionChanged += General_CollectionChanged;
         }
 
         private void General_CollectionChanged (object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -102,9 +94,39 @@ namespace Pollsar.Shared.Models
                 OnPropertyChanged();
             }
         }
-        public virtual ObservableCollection<PollChoiceViewModel> Choices => choices;
-        public virtual ObservableCollection<string> Tags => tags;
-        public virtual ObservableCollection<string> Categories => categories;
-        public virtual ObservableCollection<string> Images => images;
+        public virtual ObservableCollection<PollChoiceViewModel> Choices
+        {
+            get => choices;
+            set
+            {
+                choices = value;
+                choices.CollectionChanged += General_CollectionChanged;
+            }
+        }
+        public virtual ObservableCollection<string> Tags
+        {
+            get => tags;
+            set
+            {
+                tags = value;
+                choices.CollectionChanged += General_CollectionChanged;
+            }
+        }
+        public virtual ObservableCollection<string> Categories
+        {
+            get => categories; set
+            {
+                categories = value;
+                choices.CollectionChanged += General_CollectionChanged;
+            }
+        }
+        public virtual ObservableCollection<string> Images
+        {
+            get => images; set
+            {
+                images = value;
+                choices.CollectionChanged += General_CollectionChanged;
+            }
+        }
     }
 }
