@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 using AutoMapper;
 
@@ -11,7 +12,13 @@ namespace Pollsar.Web.Server
     {
         public AutoMapperProfile ()
         {
-            CreateMap<User, UserViewModel>();
+            CreateMap<User, UserViewModel>()
+                .ReverseMap();
+            CreateMap<NewUserViewModel, User>()
+                .ForMember(u => u.LockoutEnabled, options => options.MapFrom(u => false))
+                .ForMember(u => u.UserName, options => options.MapFrom(u => u.Email))
+                .ForMember(u => u.SecurityStamp, options => options.MapFrom(u => Guid.NewGuid().ToString()));
+
             CreateMap<Poll, PollViewModel>()
                 .ForMember(pvm => pvm.Categories, config =>
                 {

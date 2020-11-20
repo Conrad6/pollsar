@@ -26,8 +26,8 @@ namespace Name
             _mapper = mapper;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> GetPollsAsync ([FromQuery] int page = 0, [FromQuery] int size = 50)
+        [HttpGet]
+        public async Task<ActionResult<ResponseEntity<PollViewModel>>> GetPollsAsync ([FromQuery] int page = 0, [FromQuery] int size = 50)
         {
             if (page < 0) return BadRequest(new { error = "Page cannot be less than zero" });
             if (size <= 0) return BadRequest(new { error = "Page size cannot be less than or equal to zero" });
@@ -74,7 +74,20 @@ namespace Name
             pageLinkBuilder.AppendFormat(pageLinkFormat, Request.Scheme, Request.Host, totalPages - 1, size);
             lastPage = pageLinkBuilder.ToString();
 
-            return Json(new { page, size, totalCount, totalPages, nextPage, previousPage, lastPage, polls = polls.Select(p => _mapper.Map<PollViewModel>(p)) });
+            var response = new ResponseEntity<PollViewModel>
+            {
+
+                Content = polls.Select(p => _mapper.Map<PollViewModel>(p)),
+                Page = page,
+                Size = size,
+                TotalCount = totalCount,
+                TotalPages = (int) totalPages,
+                NextPage = nextPage,
+                PreviousPage = previousPage,
+                LastPage = lastPage
+            };
+
+            return Json(response);
         }
     }
 }

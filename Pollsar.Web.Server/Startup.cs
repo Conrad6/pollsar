@@ -51,12 +51,15 @@ namespace Pollsar.Web.Server
                 .AddEntityFrameworkStores<PollsarContext>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters
+                .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
                 {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                    };
+                    options.SaveToken = true;
                 });
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme);
             var autoMapperConfig = new MapperConfiguration(conf => conf.AddProfile<AutoMapperProfile>());
             services.AddSingleton(autoMapperConfig.CreateMapper());
         }

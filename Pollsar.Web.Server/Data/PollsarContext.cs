@@ -229,7 +229,7 @@ namespace Pollsar.Web.Data
                 b.Property(u => u.DateAdded)
                 .HasValueGenerator<DateTimeGenerator>()
                 .ValueGeneratedOnAdd();
-
+                b.Property(u => u.Names).IsRequired();
                 b.Property(u => u.LastUpdated)
                 .HasValueGenerator<DateTimeGenerator>()
                 .ValueGeneratedOnAddOrUpdate();
@@ -272,6 +272,7 @@ namespace Pollsar.Web.Data
 
             var admin = new User
             {
+                Names = "Conrad Bekondo",
                 PhoneNumber = null,
                 DateAdded = DateTime.Now,
                 Email = "philllittle302@gmail.com",
@@ -300,12 +301,13 @@ namespace Pollsar.Web.Data
 
             var i = adminId;
             var usersFaker = new Faker<User>()
+                .RuleFor(u => u.Names, f => f.Name.FullName())
                 .RuleFor(u => u.Avatar, f => f.Internet.Avatar())
                 .RuleFor(u => u.Id, f => ++i)
                 .RuleFor(u => u.Email, f => f.Internet.Email())
                 .RuleFor(u => u.NormalizedEmail, (f, u) => u.Email.ToUpper())
                 .RuleFor(u => u.UserName, (f, u) => u.Email)
-                .RuleFor(u => u.NormalizedEmail, (f, u) => u.Email.ToUpper())
+                .RuleFor(u => u.NormalizedUserName, (f, u) => u.Email.ToUpper())
                 .RuleFor(u => u.ConcurrencyStamp, f => f.Random.Uuid().ToString())
                 .RuleFor(u => u.SecurityStamp, f => f.Random.Uuid().ToString())
                 .RuleFor(u => u.PasswordHash, (f, u) => passwordHasher.HashPassword(u, f.Internet.Password()));
